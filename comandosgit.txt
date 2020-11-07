@@ -1,0 +1,4 @@
+git add --all 
+git commit -m "algun mensaje "
+git push origin master
+(para guardar cambios)
