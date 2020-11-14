@@ -1,85 +1,164 @@
-#include "tabla_compus.h"
+#include "Tabla_Compus.h"
 #include <iostream>
+#include "string.h"
 
 using namespace std;
 
 
-tabla_compus :: tabla_compus ()
+Tabla_Compus :: Tabla_Compus ()
 {
-    filas_compu = NULL;
-
+    inicio = NULL;
 }
 
-tabla_compus :: ~tabla_compus ()
+Tabla_Compus :: ~Tabla_Compus ()
 {
-    columnas_compu_nodo * aux = filas_compu;
+    Fila_Compu_Nodo * aux = inicio;
 
-    while (filas_compu != NULL)
+    while (inicio != NULL)
     {
         aux = aux->next;
-        delete filas_compu;
-        filas_compu = aux;
+        delete inicio;
+        inicio = aux;
     }
 }
 
-void tabla_compus::agregar (
-    string nro_serie,
-    string modelo,
-    estado_compu_t estado,
-    bool   encriptada,
-    bool   garantia,
-    string usuario,
-    estado_docusing_t docusing_checklist,
-    estado_docusing_t docusing_entrega,
-    estado_docusing_t docusing_devolucion,
-    time_t fecha_de_entrega,
-    time_t fecha_de_devolucion,
-    time_t fecha_de_docusing)
+void Tabla_Compus::agregar (Fila_Compu * fila_compu)
 {
-    columnas_compu_nodo * nueva_compu = new columnas_compu_nodo;
+    Fila_Compu_Nodo * nueva_compu = new Fila_Compu_Nodo;
 
-    nueva_compu->data.nro_serie             = nro_serie;
-    nueva_compu->data.modelo                = modelo;
-    nueva_compu->data.estado                = estado;
-    nueva_compu->data.encriptada            = encriptada;
-    nueva_compu->data.garantia              = garantia;
-    nueva_compu->data.usuario               = usuario;
-    nueva_compu->data.docusing_checklist    = docusing_checklist;
-    nueva_compu->data.docusing_entrega      = docusing_entrega;
-    nueva_compu->data.docusing_devolucion   = docusing_devolucion;
-    nueva_compu->data.fecha_de_entrega      = fecha_de_entrega;
-    nueva_compu->data.fecha_de_devolucion   = fecha_de_devolucion;
-    nueva_compu->data.fecha_de_docusing     = fecha_de_docusing;
-
-    by_nro_serie           .agregar_compu (nro_serie,           nueva_compu);
-    by_modelo              .agregar_compu (modelo,              nueva_compu);
-    by_estado              .agregar_compu (estado,              nueva_compu);
-    by_encriptada          .agregar_compu (encriptada,          nueva_compu);
-    by_garantia            .agregar_compu (garantia,            nueva_compu);
-    by_usuario             .agregar_compu (usuario,             nueva_compu);
-    by_docusing_checklist  .agregar_compu (docusing_checklist,  nueva_compu);
-    by_docusing_entrega    .agregar_compu (docusing_entrega,    nueva_compu);
-    by_docusing_devolucion .agregar_compu (docusing_devolucion, nueva_compu);
-
-    nueva_compu->next = filas_compu;
-    filas_compu = nueva_compu;
+    nueva_compu->data = fila_compu;
+    nueva_compu->next = inicio;
+    inicio = nueva_compu;
 }
 
-void tabla_compus::agregar (
-        string nro_serie,
-        string modelo)
+Fila_Compu_Nodo * Tabla_Compus::buscar_por_id (int compu_id)
 {
-    agregar (
-        /*nro_serie*/           nro_serie,
-        /*modelo*/              modelo,
-        /*estado*/              DISPONIBLE,
-        /*encriptada*/          true,
-        /*garantia*/            true,
-        /*usuario*/             "",
-        /*docusing_checklist*/  SIN_ENVIAR,
-        /*docusing_entrega*/    SIN_ENVIAR,
-        /*docusing_devolucion*/ SIN_ENVIAR,
-        /*fecha_de_entrega*/    0,
-        /*fecha_de_devolucion*/ 0,
-        /*fecha_de_docusing*/   0);
+    Fila_Compu_Nodo * pr = inicio;
+
+    while (pr != NULL)
+    {
+        if (pr->data->compu_id == compu_id)
+        {
+            return pr;
+        }
+
+        pr = pr->next;
+    }
+    
+    return NULL;
+}
+
+Fila_Compu_Nodo * Tabla_Compus::buscar_por_posicion (int posicion)
+{
+    int i = 0;
+    Fila_Compu_Nodo * pr = inicio;
+
+    while (pr != NULL)
+    {
+        if (i == posicion)
+        {
+            return pr;
+        }
+
+        pr = pr->next;
+        i++;
+    }
+    
+    return NULL;
+}
+
+void Tabla_Compus::borrar (Fila_Compu_Nodo * fila_compu_nodo)
+{
+    Fila_Compu_Nodo * pr = inicio;
+
+    if (inicio == fila_compu)
+    {
+        pr = pr->next;
+        delete inicio;
+        inicio = pr;
+    }
+    else
+    {
+        while (pr != NULL && pr->next != fila_compu)
+        {
+            pr = pr->next;
+        }
+        if (pr->next == fila_compu)
+        {
+            pr->next = fila_compu_nodo->next;
+            delete fila_compu_nodo;
+        }
+    }
+}
+
+void Tabla_Compus::ordenar_por_nro_serie (bool invertir)
+{
+    Fila_Compu_Nodo *i, *j;
+    Fila_Compu * aux;
+
+    if (inicio == NULL || inicio->next == NULL)
+    {
+        return;
+    }
+
+    for (i = inicio; i != NULL; i = i->next)
+    {
+        for (j = i->next; j != NULL; j = j->next)
+        {
+            if (invertir)
+            {
+                if (i->data->nro_serie < j->data->nro_serie)
+                {
+                    aux     = i->data;
+                    i->data = j->data;
+                    j->data = aux;
+                }
+            }
+            else
+            {
+                if (i->data->nro_serie > j->data->nro_serie)
+                {
+                    aux     = i->data;
+                    i->data = j->data;
+                    j->data = aux;
+                }
+            }
+        }
+    }
+}
+
+void Tabla_Compus::ordenar_por_encriptada (bool invertir)
+{
+    Fila_Compu_Nodo *i, *j;
+    Fila_Compu * aux;
+
+    if (inicio == NULL || inicio->next == NULL)
+    {
+        return;
+    }
+
+    for (i = inicio; i != NULL; i = i->next)
+    {
+        for (j = i->next; j != NULL; j = j->next)
+        {
+            if (invertir)
+            {
+                if (i->data->encriptada > j->data->encriptada)
+                {
+                    aux     = i->data;
+                    i->data = j->data;
+                    j->data = aux;
+                }
+            }
+            else
+            {
+                if (i->data->encriptada < j->data->encriptada)
+                {
+                    aux     = i->data;
+                    i->data = j->data;
+                    j->data = aux;
+                }
+            }
+        }
+    }
 }

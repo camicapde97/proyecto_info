@@ -1,51 +1,27 @@
-#ifndef TABLA_COMPUS_H_
-#define TABLA_COMPUS_H_
+#ifndef TABLA_COMPUS_H
+#define TABLA_COMPUS_H
 
-#include "columnas_compu.h"
+#include "Fila_Compu.h"
 #include "map_int.h"
 #include "map_str.h"
 
 using namespace std;
 
-class tabla_compus
+class Tabla_Compus
 {
     public:
-        columnas_compu_nodo * filas_compu;
+        Fila_Compu_Nodo * inicio;
 
-        map_str by_nro_serie;
-        map_str by_modelo;
-        map_int by_estado;
-        map_int by_encriptada;
-        map_int by_garantia;
-        map_str by_usuario;
-        map_int by_docusing_checklist;
-        map_int by_docusing_entrega;
-        map_int by_docusing_devolucion;
+        Tabla_Compus ();
+        ~Tabla_Compus ();
 
-        tabla_compus ();
-        ~tabla_compus ();
+        void agregar (Fila_Compu * fila_compu);
 
-        void agregar (
-            string nro_serie,
-            string modelo,
-            int    estado,
-            bool   encriptada,
-            bool   garantia,
-            string usuario,
-            int    docusing_checklist,
-            int    docusing_entrega,
-            int    docusing_devolucion,
-            time_t fecha_de_entrega,
-            time_t fecha_de_devolucion,
-            time_t fecha_de_docusing);
-
-        void agregar (
-            string nro_serie,
-            string modelo);
-
-        // TODO:
-        void borrar ();
-        void ordenar ();
+        Fila_Compu_Nodo * buscar_por_id (int compu_id);
+        Fila_Compu_Nodo * buscar_por_posicion (int posicion);
+        void borrar (Fila_Compu_Nodo * fila_compu_nodo);
+        void ordenar_por_nro_serie (bool invertir);
+        void ordenar_por_encriptada (bool invertir);
 };
 
-#endif // TABLA_COMPUS_H_
+#endif // TABLA_COMPUS_H
